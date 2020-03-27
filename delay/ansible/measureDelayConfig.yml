@@ -1,0 +1,44 @@
+- hosts: src_server
+  become: true
+  gather_facts: no
+  tasks:
+    - name: Add key
+      shell: wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+    - name: Add source
+      shell: echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+    - name: Install filebeat
+      apt:
+        name: ['filebeat']
+        update_cache: yes
+    - name: Delete filebeat.yml default configuration file
+      file:
+        path: /etc/filebeat/filebeat.yml
+        state: absent
+    - name: Copy filebeat.yml template
+      copy:
+        src: /home/user/filebeat.yml
+        dest: /etc/filebeat/filebeat.yml
+        owner: root
+        group: root
+        mode: 0644
+    - name: Replace Kafka IP
+      replace:
+        path: /etc/filebeat/filebeat.yml
+        regexp: 'KAFKA_IP'
+        replace: "{{kafka_ip_address}}"
+    - name: Replace Kafka topic
+      replace:
+        path: /etc/filebeat/filebeat.yml
+        regexp: 'KAFKA_TOPIC'
+        replace: "{{kafka_topic}}"
+    - name: Replace file path
+      replace:
+        path: /etc/filebeat/filebeat.yml
+        regexp: 'FILE_PATH'
+        replace: "{{monitored_file_path}}"
+    - name: Start filebeat service
+      service: 
+      service:
+        name: filebeat
+        state: started
+

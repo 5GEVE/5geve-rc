@@ -1,0 +1,22 @@
+- hosts: src_server
+  become: false
+  gather_facts: no
+  tasks:
+    - name: Ping from source to destination
+      shell: ping -c30 {{dst_server_ip}} | tee -a /home/user/src_ping
+      register: src_ping
+    - name: Print ping result
+      debug:
+        var: src_ping.stdout
+
+#- hosts: dst_server
+#  become: false
+#  gather_facts: no
+#  tasks:
+#    - name: Ping from destination to source
+#     shell: ping -c5 {{src_server_ip}} | tee -a /home/user/dst_ping
+#      register: dst_ping
+#    - name: Print ping result
+#      debug:
+#        var: dst_ping.stdout
+
