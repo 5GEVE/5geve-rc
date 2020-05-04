@@ -24,12 +24,15 @@ ${PROBE_USERNAME}           user
 ${PROBE_PASSWORD}           root
 
 # Variables related to the experiment execution
-${COMMAND}					'sudo python3 /home/${PROBE_USERNAME}/metric_generator.py'
+
+${SUDO}						true
+${SHEBANG}					/usr/bin/python3
+${SCRIPT}					/home/${PROBE_USERNAME}/metric_generator.py
 
 # Variables related to the RF execution, composed from previous variables
 
 ${BUILD_HOSTS_FILE}         cd ${RC_SCRIPT_LOCATION}; touch hosts; echo "server ansible_host=${PROBE_MGMT_ADDRESS} ansible_user=${PROBE_USERNAME} ansible_ssh_pass=${PROBE_PASSWORD} ansible_become_pass=${PROBE_PASSWORD}" | tee -a hosts > /dev/null
-${RUN_SCRIPT}               cd ${RC_SCRIPT_LOCATION}; touch ansible_config_log; export ANSIBLE_HOST_KEY_CHECKING=False; /usr/bin/ansible-playbook -i hosts execute_script.yml -e "command=${COMMAND}" > ansible_config_log
+${RUN_SCRIPT}               cd ${RC_SCRIPT_LOCATION}; touch ansible_config_log; export ANSIBLE_HOST_KEY_CHECKING=False; /usr/bin/ansible-playbook -i hosts execute_script.yml -e "sudo=${SUDO} shebang=${SHEBANG} script=${SCRIPT}" > ansible_config_log
 
 *** Test Cases ***
 Launch script at RC to apply the Day-2 Configuration in probes

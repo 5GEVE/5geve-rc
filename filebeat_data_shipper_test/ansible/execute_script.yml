@@ -1,6 +1,6 @@
 - hosts: server
-  become: false
+  become: "{{ sudo }}"
   gather_facts: no
   tasks:
     - name: Execute script provided
-      shell: "{{command}}"
+      shell: "{{ shebang }} {{ script }}"
