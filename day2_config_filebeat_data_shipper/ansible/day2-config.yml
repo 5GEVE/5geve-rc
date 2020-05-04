@@ -1,0 +1,83 @@
+- hosts: server
+  become: true
+  gather_facts: no
+  tasks:
+    - name: Add key
+      shell: wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+    - name: Add source
+      shell: echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+    - name: Install filebeat
+      apt:
+        name: ['filebeat']
+        update_cache: yes
+    - name: Delete filebeat.yml default configuration file
+      file:
+        path: /etc/filebeat/filebeat.yml
+        state: absent
+    - name: Copy filebeat.yml template
+      copy:
+        src: /home/user/filebeat.yml
+        dest: /etc/filebeat/filebeat.yml
+        owner: root
+        group: root
+        mode: 0644
+    - name: Replace Kafka IP
+      replace:
+        path: /etc/filebeat/filebeat.yml
+        regexp: 'BROKER_IP_ADDRESS'
+        replace: "{{broker_ip_address}}"
+    - name: Replace Kafka topic
+      replace:
+        path: /etc/filebeat/filebeat.yml
+        regexp: 'TOPIC_NAME'
+        replace: "{{topic_name}}"
+    - name: Replace file path
+      replace:
+        path: /etc/filebeat/filebeat.yml
+        regexp: 'MONITORED_FILE_PATH'
+        replace: "{{monitored_file_path}}"
+    - name: Start filebeat service
+      service: 
+      service:
+        name: filebeat
+        state: started
+    - name: Create information model file related to the metric to be monitored
+      file:
+        path: /usr/bin/{{topic_name}}-day2-config.yml
+        state: touch
+        mode: u=rw,g=r,o=r
+    - name: Create information model file related to the metric to be monitored
+      file:
+        path: /usr/bin/{{topic_name}}-day2-config.yml
+        state: touch
+        mode: u=rw,g=r,o=r
+    - name: Include broker_ip_address parameter in the information model file
+      lineinfile:
+        path: /usr/bin/{{topic_name}}-day2-config.yml
+        line: "broker_ip_address: {{broker_ip_address}}"
+        insertafter: EOF
+    - name: Include topic_name parameter in the information model file
+      lineinfile:
+        path: /usr/bin/{{topic_name}}-day2-config.yml
+        line: "topic_name: {{topic_name}}"
+        insertafter: EOF
+    - name: Include device_id parameter in the information model file
+      lineinfile:
+        path: /usr/bin/{{topic_name}}-day2-config.yml
+        line: "device_id: {{device_id}}"
+        insertafter: EOF
+    - name: Include unit parameter in the information model file
+      lineinfile:
+        path: /usr/bin/{{topic_name}}-day2-config.yml
+        line: "unit: {{unit}}"
+        insertafter: EOF
+    - name: Include interval parameter in the information model file
+      lineinfile:
+        path: /usr/bin/{{topic_name}}-day2-config.yml
+        line: "interval: {{interval}}"
+        insertafter: EOF
+    - name: Include context parameter in the information model file
+      lineinfile:
+        path: /usr/bin/{{topic_name}}-day2-config.yml
+        line: "context: {{context}}"
+        insertafter: EOF
