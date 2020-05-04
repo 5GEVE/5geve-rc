@@ -33,10 +33,10 @@ ${CONTEXT}                  "param1=value1 param2=value2"
 # Variables related to the RF execution, composed from previous variables
 ${MONITORED_FILE_PATH}      /var/log/${TOPIC_NAME}.log     #monitored.path
 ${BUILD_HOSTS_FILE}         cd ${RC_SCRIPT_LOCATION}; touch hosts; echo "server ansible_host=${PROBE_MGMT_ADDRESS} ansible_user=${PROBE_USERNAME} ansible_ssh_pass=${PROBE_PASSWORD} ansible_become_pass=${PROBE_PASSWORD} device_id=${DEVICE_ID}" | tee -a hosts > /dev/null     #hosts.file.exec
-${RUN_SCRIPT}               cd ${RC_SCRIPT_LOCATION}; touch ansible_config_log; ansible-playbook -i hosts day2-config.yml -e "broker_ip_address=${BROKER_IP_ADDRESS} topic_name=${TOPIC_NAME} unit=${UNIT} interval=${INTERVAL} context=${CONTEXT} monitored_file_path=${MONITORED_FILE_PATH}" > ansible_config_log     #script.exec
+${RUN_SCRIPT}               cd ${RC_SCRIPT_LOCATION}; touch ansible_config_log; export ANSIBLE_HOST_KEY_CHECKING=False; ansible-playbook -i hosts day2-config.yml -e "broker_ip_address=${BROKER_IP_ADDRESS} topic_name=${TOPIC_NAME} unit=${UNIT} interval=${INTERVAL} context='${CONTEXT}' monitored_file_path=${MONITORED_FILE_PATH}" > ansible_config_log     #script.exec
 
 *** Test Cases ***
-Launch script at RC to configure the probes required in method "measureDelay"
+Launch script at RC to apply the Day-2 Configuration in probes
     Open Connection to Runtime Configurator and Log In
     Execute Command    ${BUILD_HOSTS_FILE}
     Execute Command    ${RUN_SCRIPT}

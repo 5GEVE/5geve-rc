@@ -16,7 +16,7 @@
         state: absent
     - name: Copy filebeat.yml template
       copy:
-        src: /home/user/filebeat.yml
+        src: filebeat.yml
         dest: /etc/filebeat/filebeat.yml
         owner: root
         group: root
