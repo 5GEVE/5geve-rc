@@ -35,7 +35,7 @@ ${BUILD_HOSTS_FILE}         cd ${RC_SCRIPT_LOCATION}; touch hosts; echo "server 
 ${RUN_SCRIPT}               cd ${RC_SCRIPT_LOCATION}; touch ansible_output; export ANSIBLE_HOST_KEY_CHECKING=False; /usr/bin/ansible-playbook -i hosts execute_script.yml -e "sudo=${SUDO} shebang=${SHEBANG} script=${SCRIPT}" > ansible_output
 
 *** Test Cases ***
-Launch script at RC to apply the Day-2 Configuration in probes
+Launch script at RC to execute the experiment
     Open Connection to Runtime Configurator and Log In
     Execute Command    ${BUILD_HOSTS_FILE}
     Execute Command    ${RUN_SCRIPT}
