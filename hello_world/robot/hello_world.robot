@@ -22,7 +22,7 @@ ${BUILD_HOSTS_FILE}         cd ${RC_SCRIPT_LOCATION}; touch hosts; echo "src_ser
 ${RUN_SCRIPT}               cd ${RC_SCRIPT_LOCATION}; touch ansible_output; ansible-playbook -i hosts hello_world.yml > ansible_output
 
 *** Test Cases ***
-Launch script at RC to measure two-way delay between two probes
+Execute Hello World
     Open Connection to Runtime Configurator and Log In
     Execute Command    ${BUILD_HOSTS_FILE}
     Execute Command    ${RUN_SCRIPT}
