@@ -37,6 +37,38 @@
         path: /usr/bin/{{metric_id}}-day2-config.yml
         line: "context: {{context}}"
         insertafter: EOF
+    - name: Installation of required packages related to Python
+      apt:
+        name: [python3', 'python3-pip']
+        update_cache: yes
+    - name: Select default locale
+      debconf:
+        name: locales
+        question: locales/default_environment_locale
+        value: en_US.UTF-8
+        vtype: select
+      notify:
+        - Rebuild locales database
+    - name: Build /etc/locale.gen
+      lineinfile:
+        dest: /etc/locale.gen
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        state: "{{ item.state }}"
+      with_items:
+        - { regexp: '^#? ?de_DE ISO-8859-1', line: 'de_DE ISO-8859-1', state: present }
+        - { regexp: '^#? ?de_DE.UTF-8 UTF-8', line: 'de_DE.UTF-8 UTF-8', state: present }
+        - { regexp: '^#? ?de_DE@euro ISO-8859-15', line: 'de_DE@euro ISO-8859-15', state: present }
+        - { regexp: '^#? ?en_GB ISO-8859-1', line: 'en_GB ISO-8859-1', state: present }
+        - { regexp: '^#? ?en_GB.ISO-8859-15 ISO-8859-15', line: 'en_GB.ISO-8859-15 ISO-8859-15', state: present }
+        - { regexp: '^#? ?en_GB.UTF-8 UTF-8', line: 'en_GB.UTF-8 UTF-8', state: present }
+        - { regexp: '^#? ?en_US ISO-8859-1', line: 'en_US ISO-8859-1', state: present }
+        - { regexp: '^#? ?en_US.ISO-8859-15 ISO-8859-15', line: 'en_US.ISO-8859-15 ISO-8859-15', state: present }
+        - { regexp: '^#? ?en_US.UTF-8 UTF-8', line: 'en_US.UTF-8 UTF-8', state: present }
+      notify:
+        - Rebuild locales database
+    - name: Install Kafka library by using pip3
+      shell: pip3 install kafka
     - name: Add key
       shell: wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
       when: simple == "no"
@@ -85,3 +117,9 @@
         name: filebeat
         state: started
       when: simple == "no"
+  handlers:
+    - name: Rebuild locales database
+      command: "{{ item }}"
+      with_items:
+        - dpkg-reconfigure locales -f noninteractive
+        - /usr/sbin/locale-gen
