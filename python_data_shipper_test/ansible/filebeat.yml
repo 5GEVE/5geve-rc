@@ -1,7 +1,4 @@
 filebeat.inputs:
-- input_type: log
-  paths:
-    - MONITORED_FILE_PATH
 
 processors:
   - decode_csv_fields:
@@ -24,7 +21,7 @@ processors:
               result[json_fields[index]] = field;
               return result;
             }, {})
-            var value = { 
+            var value = {
               value: json_from_csv
             };
             var record = [value];
@@ -36,4 +33,4 @@ processors:
 
 output.kafka:
   hosts: ["BROKER_IP_ADDRESS:9092"]
-  topic: 'TOPIC_NAME'
+  topic: "%{[fields][topic_id]}"

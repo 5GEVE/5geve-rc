@@ -80,11 +80,25 @@
         name: ['filebeat']
         update_cache: yes
       when: simple == "no"
+    - name: Stop filebeat service
+      service:
+        name: filebeat
+        state: stopped
+      when: simple == "no"
+    - name: Check that /etc/filebeat/filebeat.yml file exists
+      stat:
+         path: /etc/filebeat/filebeat.yml
+      register: filebeat_file
+      when: simple == "no"
+    - name: Check if filebeat.yml has been already copied by checking a particular string
+      shell: cat /etc/filebeat/filebeat.yml | grep "kafka" | wc -l
+      register: output
+      when: simple == "no" and filebeat_file.stat.exists
     - name: Delete filebeat.yml default configuration file
       file:
         path: /etc/filebeat/filebeat.yml
         state: absent
-      when: simple == "no"
+      when: simple == "no" and filebeat_file.stat.exists and output.stdout == "0"
     - name: Copy filebeat.yml template
       copy:
         src: filebeat.yml
@@ -92,27 +106,45 @@
         owner: root
         group: root
         mode: 0644
-      when: simple == "no"
+      when: simple == "no" and filebeat_file.stat.exists and output.stdout == "0"
+    - name: Copy filebeat.yml template
+      copy:
+        src: filebeat.yml
+        dest: /etc/filebeat/filebeat.yml
+        owner: root
+        group: root
+        mode: 0644
+      when: simple == "no" and not filebeat_file.stat.exists
     - name: Replace Kafka IP
       replace:
         path: /etc/filebeat/filebeat.yml
         regexp: 'BROKER_IP_ADDRESS'
         replace: "{{broker_ip_address}}"
-      when: simple == "no"
-    - name: Replace Kafka topic
+      when: simple == "no" and filebeat_file.stat.exists and output.stdout == "0"
+    - name: Replace Kafka IP
       replace:
         path: /etc/filebeat/filebeat.yml
-        regexp: 'TOPIC_NAME'
-        replace: "{{topic_name}}"
-      when: simple == "no"
-    - name: Replace file path
-      replace:
+        regexp: 'BROKER_IP_ADDRESS'
+        replace: "{{broker_ip_address}}"
+      when: simple == "no" and not filebeat_file.stat.exists
+    - name: Include the Filebeat input
+      blockinfile:
         path: /etc/filebeat/filebeat.yml
-        regexp: 'MONITORED_FILE_PATH'
-        replace: "{{monitored_file_path}}"
+        insertafter: 'filebeat.inputs:'
+        block: |
+          - input_type: log
+            fields:
+              topic_id: {{ topic_name }}
+            paths:
+              - {{ monitored_file_path }}
+      when: simple == "no"
+    - name: Remove blockinfile markers
+      lineinfile:
+        path: /etc/filebeat/filebeat.yml
+        state: absent
+        regexp: '.*ANSIBLE.*'
       when: simple == "no"
     - name: Start filebeat service
-      service: 
       service:
         name: filebeat
         state: started

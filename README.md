@@ -23,6 +23,6 @@ The scripts provided in this repository are:
 | Name | Description |
 | --- | --- |
 | delay | Delay measurement, with Day-2 configuration, but not using the information model |
-| filebeat_data_shipper_test | Publish dummy data in Kafka by using Filebeat, which translates CSV data to JSON, using Day-2 configuration and the information model proposed |
+| filebeat_data_shipper_test | Publish dummy data in Kafka by using Filebeat, which translates CSV data to JSON, using Day-2 configuration and the information model proposed. It monitors two different metrics in the same Filebeat service |
 | hello_world | Only prints Hello World |
-| python_data_shipper_test | Publish dummy data in Kafka by using Python, directly using a JSON chain, using Day-2 configuration and the information model proposed |
+| python_data_shipper_test | Publish dummy data in Kafka by using Python, directly using a JSON chain, using Day-2 configuration and the information model proposed. Only one metric is monitored |
