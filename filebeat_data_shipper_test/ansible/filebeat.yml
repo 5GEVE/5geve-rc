@@ -1,6 +1,5 @@
 filebeat.inputs:
 
-
 processors:
   - decode_csv_fields:
       fields:

@@ -53,17 +53,20 @@
         name: filebeat
         state: stopped
       when: simple == "no"
+    - name: Check that /etc/filebeat/filebeat.yml file exists
+      stat:
+         path: /etc/filebeat/filebeat.yml
+      register: filebeat_file
+      when: simple == "no"
     - name: Check if filebeat.yml has been already copied by checking a particular string
-      lineinfile:
-        path: /etc/filebeat/filebeat.yml
-        state: absent
-        regexp: 'output.kafka:'
+      shell: cat /etc/filebeat/filebeat.yml | grep "kafka" | wc -l
       register: output
+      when: simple == "no" and filebeat_file.stat.exists
     - name: Delete filebeat.yml default configuration file
       file:
         path: /etc/filebeat/filebeat.yml
         state: absent
-      when: simple == "no" and not output.found
+      when: simple == "no" and filebeat_file.stat.exists and output.stdout == "0"
     - name: Copy filebeat.yml template
       copy:
         src: filebeat.yml
@@ -71,38 +74,44 @@
         owner: root
         group: root
         mode: 0644
-      when: simple == "no" and not output.found
+      when: simple == "no" and filebeat_file.stat.exists and output.stdout == "0"
+    - name: Copy filebeat.yml template
+      copy:
+        src: filebeat.yml
+        dest: /etc/filebeat/filebeat.yml
+        owner: root
+        group: root
+        mode: 0644
+      when: simple == "no" and not filebeat_file.stat.exists
     - name: Replace Kafka IP
       replace:
         path: /etc/filebeat/filebeat.yml
         regexp: 'BROKER_IP_ADDRESS'
         replace: "{{broker_ip_address}}"
-      when: simple == "no" and not output.found
-    - name: Include the file to be monitored by Filebeat
+      when: simple == "no" and filebeat_file.stat.exists and output.stdout == "0"
+    - name: Replace Kafka IP
+      replace:
+        path: /etc/filebeat/filebeat.yml
+        regexp: 'BROKER_IP_ADDRESS'
+        replace: "{{broker_ip_address}}"
+      when: simple == "no" and not filebeat_file.stat.exists
+    - name: Include the Filebeat input
+      blockinfile:
+        path: /etc/filebeat/filebeat.yml
+        insertafter: 'filebeat.inputs:'
+        block: |
+          - input_type: log
+            fields:
+              topic_id: {{ topic_name }}
+            paths:
+              - {{ monitored_file_path }}
+      when: simple == "no"
+    - name: Remove blockinfile markers
       lineinfile:
         path: /etc/filebeat/filebeat.yml
-        line: '    - {{ monitored_file_path }}'
-        insertafter: 'filebeat.inputs:'
-    - name: Include the paths field
-      lineinfile:
-        path: /etc/filebeat/filebeat.yml
-        line: '  paths:'
-        insertafter: 'filebeat.inputs:'
-    - name: Include the Kafka topic
-      lineinfile:
-        path: /etc/filebeat/filebeat.yml
-        line: '    topic_id: {{ topic_name }}'
-        insertafter: 'filebeat.inputs:'
-    - name: Include the fields field
-      lineinfile:
-        path: /etc/filebeat/filebeat.yml
-        line: '  fields:'
-        insertafter: 'filebeat.inputs:'
-    - name: Include the input type field
-      lineinfile:
-        path: /etc/filebeat/filebeat.yml
-        line: '- input_type: log'
-        insertafter: 'filebeat.inputs:'
+        state: absent
+        regexp: '.*ANSIBLE.*'
+      when: simple == "no"
     - name: Start filebeat service
       service:
         name: filebeat
