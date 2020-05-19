@@ -12,7 +12,7 @@ Library           BuiltIn
 ${RC_MGMT_ADDRESS}          127.0.0.1
 ${RC_USERNAME}              ramon
 ${RC_PASSWORD}              iW1L.27!
-${RC_SCRIPT_LOCATION}       /home/ramon/${RC_USERNAME}/spanish_site_demo_20th_may_2020/ansible
+${RC_SCRIPT_LOCATION}       /home/${RC_USERNAME}/5geve-rc/spanish_site_demo_20th_may_2020/ansible
 
 # Variables related to the Kafka broker
 # Broker IP address is a static parameter, but topic name must come from ELM
