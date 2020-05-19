@@ -19,8 +19,8 @@ interval_value = int(re.compile('([0-9]+)([a-zA-Z]+)').match(interval).group(1))
 interval_unit = re.compile('([0-9]+)([a-zA-Z]+)').match(interval).group(2)
 context = f.readline().split(":")[1].strip().replace("|", " ")                      # change "|" for " "
 
-day2_file_path_2 = "/usr/bin/tracked_devices-day2-config.yml"
-log_file_path_2 = "/var/log/tracked_devices.log"
+day2_file_path_2 = "/usr/bin/user_equipments-day2-config.yml"
+log_file_path_2 = "/var/log/user_equipments.log"
 
 f_2 = open(day2_file_path_2, "r")
 broker_ip_address_2 = f_2.readline().split(":")[1].strip() + ":9092"                    # not used if Filebeat is provided

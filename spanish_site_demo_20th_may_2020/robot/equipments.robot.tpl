@@ -33,7 +33,7 @@ ${DEVICE_ID}                5geve-vnf
 # Variables related to the metrics to be captured
 # This information is directly copied from the blueprints and can be provided by the ELM
 
-${METRIC_ID}                tracked_devices
+${METRIC_ID}                user_equipments
 ${UNIT}                     devices
 ${INTERVAL}                 5s
 

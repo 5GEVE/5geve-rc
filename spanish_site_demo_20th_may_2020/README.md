@@ -12,11 +12,11 @@ git clone git@github.com:5GEVE/5geve-rc.git
 # 2. Go to the robot folder and generate the Robot Framework scripts to be used. Before doing this, please check that all the variables defined in each robot.tpl files are correct for your deployment.
 cd $HOME/5geve-rc/spanish_site_demo_20th_may_2020/robot
 chmod +x create_scripts.sh
-./create_scripts.sh {VNF_IP_ADDRESS} {TRACKED_DEVICES_TOPIC} {DELAY_IFACE_TOPIC} {APACHE_LATENCY_TOPIC}
-# Example: ./create.sh 10.20.5.50 apache.14.spain_5tonic.application_metric.tracked_devices apache.14.spain_5tonic.application_metric.delay_iface apache.14.spain_5tonic.infrastructure_metric.apache_latency
+./create_scripts.sh {VNF_IP_ADDRESS} {USER_EQUIPMENTS_TOPIC} {DELAY_IFACE_TOPIC} {APACHE_LATENCY_TOPIC}
+# Example: ./create.sh 10.20.5.50 apache.14.spain_5tonic.application_metric.user_equipments apache.14.spain_5tonic.application_metric.delay_iface apache.14.spain_5tonic.infrastructure_metric.apache_latency
 
 # 3. Execute the Robot Framework scripts related to the Day-2 configuration of each metric.
-robot tracked.robot
+robot equipments.robot
 robot delay.robot
 robot apache.robot
 
