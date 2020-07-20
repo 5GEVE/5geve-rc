@@ -1,0 +1,131 @@
+- hosts: server
+  become: true
+  gather_facts: no
+  tasks:
+    - name: Create information model file related to the metric to be monitored
+      file:
+        path: /usr/bin/{{metric_id}}-day2-config.yml
+        state: touch
+        mode: u=rw,g=r,o=r
+    - name: Include broker_ip_address parameter in the information model file
+      lineinfile:
+        path: /usr/bin/{{metric_id}}-day2-config.yml
+        line: "broker_ip_address: {{broker_ip_address}}"
+        insertafter: EOF
+    - name: Include topic_name parameter in the information model file
+      lineinfile:
+        path: /usr/bin/{{metric_id}}-day2-config.yml
+        line: "topic_name: {{topic_name}}"
+        insertafter: EOF
+    - name: Include device_id parameter in the information model file
+      lineinfile:
+        path: /usr/bin/{{metric_id}}-day2-config.yml
+        line: "device_id: {{device_id}}"
+        insertafter: EOF
+    - name: Include unit parameter in the information model file
+      lineinfile:
+        path: /usr/bin/{{metric_id}}-day2-config.yml
+        line: "unit: {{unit}}"
+        insertafter: EOF
+    - name: Include interval parameter in the information model file
+      lineinfile:
+        path: /usr/bin/{{metric_id}}-day2-config.yml
+        line: "interval: {{interval}}"
+        insertafter: EOF
+    - name: Include context parameter in the information model file
+      lineinfile:
+        path: /usr/bin/{{metric_id}}-day2-config.yml
+        line: "context: nil"
+        insertafter: EOF
+#    - name: Check if ELK v7.x is present
+#      shell: ls /etc/apt/sources.list.d/ | grep elastic-7.x.list | wc -w
+#      register: source_list_check_v7
+#    - name: Add key
+#      shell: wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+#      when: source_list_check_v7.stdout == "0"
+#    - name: Add source
+#      shell: echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+#      when: source_list_check_v7.stdout == "0"
+#    - name: Install filebeat
+#      apt:
+#        name: ['filebeat']
+#        update_cache: yes
+#      when: source_list_check_v7.stdout == "0"
+    - name: Check if Filebeat has been previously installed
+      shell: ls /etc | grep filebeat | wc -w
+      register: filebeat_check
+    - name: Download Filebeat
+      get_url:
+        url: https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.5.0-amd64.deb
+        dest: /tmp/filebeat-7.5.0-amd64.deb
+      when: filebeat_check.stdout == "0"
+    - name: Install Filebeat
+      shell: sudo dpkg -i /tmp/filebeat-7.5.0-amd64.deb
+      when: filebeat_check.stdout == "0"
+    - name: Delete sources
+      shell: sudo rm /tmp/filebeat-7.5.0-amd64.deb
+      when: filebeat_check.stdout == "0"
+    - name: Stop filebeat service
+      service:
+        name: filebeat
+        state: stopped
+    - name: Check that /etc/filebeat/filebeat.yml file exists
+      stat:
+         path: /etc/filebeat/filebeat.yml
+      register: filebeat_file
+    - name: Check if filebeat.yml has been already copied by checking a particular string
+      shell: cat /etc/filebeat/filebeat.yml | grep "kafka" | wc -l
+      register: output
+      when: filebeat_file.stat.exists
+    - name: Delete filebeat.yml default configuration file
+      file:
+        path: /etc/filebeat/filebeat.yml
+        state: absent
+      when: filebeat_file.stat.exists and output.stdout == "0"
+    - name: Copy filebeat.yml template
+      copy:
+        src: filebeat.yml
+        dest: /etc/filebeat/filebeat.yml
+        owner: root
+        group: root
+        mode: 0644
+      when: filebeat_file.stat.exists and output.stdout == "0"
+    - name: Copy filebeat.yml template
+      copy:
+        src: filebeat.yml
+        dest: /etc/filebeat/filebeat.yml
+        owner: root
+        group: root
+        mode: 0644
+      when: not filebeat_file.stat.exists
+    - name: Replace Kafka IP
+      replace:
+        path: /etc/filebeat/filebeat.yml
+        regexp: 'BROKER_IP_ADDRESS'
+        replace: "{{broker_ip_address}}"
+      when: filebeat_file.stat.exists and output.stdout == "0"
+    - name: Replace Kafka IP
+      replace:
+        path: /etc/filebeat/filebeat.yml
+        regexp: 'BROKER_IP_ADDRESS'
+        replace: "{{broker_ip_address}}"
+      when: not filebeat_file.stat.exists
+    - name: Include the Filebeat input
+      blockinfile:
+        path: /etc/filebeat/filebeat.yml
+        insertafter: 'filebeat.inputs:'
+        block: |
+          - input_type: log
+            fields:
+              topic_id: {{ topic_name }}
+            paths:
+              - {{ monitored_file_path }}
+    - name: Remove blockinfile markers
+      lineinfile:
+        path: /etc/filebeat/filebeat.yml
+        state: absent
+        regexp: '.*ANSIBLE.*'
+    - name: Start filebeat service
+      service:
+        name: filebeat
+        state: started

@@ -1,4 +1,4 @@
-# hello_world
+# hello_world_param
 
 This script just prints the "Hello World" message + a parameter.
 

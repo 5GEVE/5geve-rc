@@ -1,4 +1,4 @@
-# 
+# spanish_site_demo_20th_may_2020
 
 This script performs the Day-2 configuration process in a specific VNF used during the Spanish Site demo on 20th May 2020, providing the information model to be used for publishing data from three different metrics in Kafka afterwards and also installing Filebeat with the necessary configuration to work properly. Then, a Python script is executed for each metric during the experiment execution process, in which data from the information model is read in order to properly generate the CSV rows to be saved in the files monitored by Filebeat, then the data is published in Kafka in the JSON format proposed in the information model defined. For that purpose, a simple Ansible playbook that executes the script provided is used.
 
