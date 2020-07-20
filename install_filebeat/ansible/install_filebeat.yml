@@ -37,20 +37,34 @@
         path: /usr/bin/{{metric_id}}-day2-config.yml
         line: "context: nil"
         insertafter: EOF
-    - name: Check if ELK v7.x is present
-      shell: ls /etc/apt/sources.list.d/ | grep elastic-7.x.list | wc -w
-      register: source_list_check_v7
-    - name: Add key
-      shell: wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-      when: source_list_check_v7.stdout == "0"
-    - name: Add source
-      shell: echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
-      when: source_list_check_v7.stdout == "0"
-    - name: Install filebeat
-      apt:
-        name: ['filebeat']
-        update_cache: yes
-      when: source_list_check_v7.stdout == "0"
+#    - name: Check if ELK v7.x is present
+#      shell: ls /etc/apt/sources.list.d/ | grep elastic-7.x.list | wc -w
+#      register: source_list_check_v7
+#    - name: Add key
+#      shell: wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+#      when: source_list_check_v7.stdout == "0"
+#    - name: Add source
+#      shell: echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+#      when: source_list_check_v7.stdout == "0"
+#    - name: Install filebeat
+#      apt:
+#        name: ['filebeat']
+#        update_cache: yes
+#      when: source_list_check_v7.stdout == "0"
+    - name: Check if Filebeat has been previously installed
+      shell: ls /etc | grep filebeat | wc -w
+      register: filebeat_check
+    - name: Download Filebeat
+      get_url:
+        url: https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.5.0-amd64.deb
+        dest: /tmp/filebeat-7.5.0-amd64.deb
+      when: filebeat_check.stdout == "0"
+    - name: Install Filebeat
+      shell: sudo dpkg -i /tmp/filebeat-7.5.0-amd64.deb
+      when: filebeat_check.stdout == "0"
+    - name: Delete sources
+      shell: sudo rm /tmp/filebeat-7.5.0-amd64.deb
+      when: filebeat_check.stdout == "0"
     - name: Stop filebeat service
       service:
         name: filebeat
