@@ -20,20 +20,20 @@ The instructions related to this playbook must be defined in this way, depending
 
 * If it is an application metric:
 
-** INSTALL_FILEBEAT <SERVER_IP_ADDRESS> <USERNAME>:<PASSWORD> *metric_id topic_name site unit interval device_id monitored_file_path*; **
+**INSTALL_FILEBEAT <SERVER_IP_ADDRESS> <USERNAME>:<PASSWORD> *metric_id topic_name site unit interval device_id monitored_file_path*;**
 
 Example of how to define operations related to this playbook in the TCBs:
 
-** INSTALL_FILEBEAT vnf.<vnfdA_id>.extcp.<extcp_id>.ipaddress $$userA:$$passwordA track_device $$metric.topic.track_device $$metric.site.track_device $$metric.unit.track_device $$metric.interval.track_device $$metric.deviceId.track_device $$monitoredPath1; **
+**INSTALL_FILEBEAT vnf.<vnfdA_id>.extcp.<extcp_id>.ipaddress $$userA:$$passwordA track_device $$metric.topic.track_device $$metric.site.track_device $$metric.unit.track_device $$metric.interval.track_device $$metric.deviceId.track_device $$monitoredPath1;**
 
 Remember that the IP address and all the references to the corresponding metric must be referenced in the infrastructureParameters field, and that the user, password and monitored path must be defined in the userParameters field.
 
 * If it is an infrastructure metric:
 
-** INSTALL_FILEBEAT <SERVER_IP_ADDRESS> <USERNAME>:<PASSWORD> *metric_id topic_name broker_ip_address unit interval device_id monitored_file_path*; **
+**INSTALL_FILEBEAT <SERVER_IP_ADDRESS> <USERNAME>:<PASSWORD> *metric_id topic_name broker_ip_address unit interval device_id monitored_file_path*;**
 
 Example of how to define operations related to this playbook in the TCBs:
 
-** INSTALL_FILEBEAT \$\$ipAddress \$\$username:\$\$password \$\$metric_id \$\$topic_name \$\$broker_ip_address \$\$unit \$\$interval nil /var/log/\$\$metric_id.log; **
+**INSTALL_FILEBEAT \$\$ipAddress \$\$username:\$\$password \$\$metric_id \$\$topic_name \$\$broker_ip_address \$\$unit \$\$interval nil /var/log/\$\$metric_id.log;**
 
 In this case, you only need to change the device_id and monitored_file_path values, as the rest of the parameters are taken from the information provided by the blueprints.
