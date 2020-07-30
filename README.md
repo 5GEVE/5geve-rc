@@ -33,3 +33,5 @@ The scripts provided in this repository are:
 | spanish_site_demo_20th_may_2020 | Scripts for the demo executed in the Spanish site the 20th May 2020 |
 
 The location of this repository in the RC component must be the following: /usr/bin/rc
+
+This work has been done by Telcaria Ideas S.L. for the 5G EVE European project under the [Apache 2.0 License](LICENSE).
