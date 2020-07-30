@@ -34,4 +34,6 @@ The scripts provided in this repository are:
 
 The location of this repository in the RC component must be the following: /usr/bin/rc
 
+## Copyright
+
 This work has been done by Telcaria Ideas S.L. for the 5G EVE European project under the [Apache 2.0 License](LICENSE).
