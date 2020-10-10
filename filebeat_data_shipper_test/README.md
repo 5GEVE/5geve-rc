@@ -19,3 +19,34 @@ robot tracking_response_time-day2-config.robot
 # 5. Execute the Robot Framework script related to the experiment execution.
 robot execute_script.robot
 ```
+
+## Metric Data Model
+
+- `metric_value` is a float or integer value
+- `timestamp` is a 10-digit float or integer value (unix epoch)
+- `unit` is any string representing the unit of the measurement
+- `device_id` is any string identifying the device generating the metric
+- `context` contains the context parameters (empty here)
+
+### CSV example
+
+```
+metric_value,timestamp,unit,device_id,context
+5.47,1602349170.00,%,localhost.localdomain,
+```
+
+### JSON example
+
+```json
+records: [
+  {
+    "value": {
+      "context": {},
+      "metric_value": 34.52,
+      "timestamp": 1602348105.56,
+      "unit": "%",
+      "device_id": "localhost.localdomain"
+    }
+  }
+]
+```
