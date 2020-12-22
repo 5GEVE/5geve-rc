@@ -24,10 +24,11 @@ The scripts provided in this repository are:
 | Name | Description |
 | --- | --- |
 | delay | Delay measurement, with Day-2 configuration, but not using the information model |
-| execute_script | It executes a script provided as an argument. This playbook is integrated with the current RC release |
+| execute_command | It executes a script provided as an argument in a Linux server. This playbook is integrated with the current RC release |
+| execute_command_windows | It executes a script provided as an argument in a Windows server. This playbook is integrated with the current RC release |
 | filebeat_data_shipper_test | Publish dummy data in Kafka by using Filebeat, which translates CSV data to JSON, using Day-2 configuration and the information model proposed. It monitors two different metrics in the same Filebeat service |
 | hello_world | Only prints Hello World |
-| hello_world | Prints Hello World + a parameter |
+| hello_world_param | Prints Hello World + a parameter |
 | install_filebeat | Similar playbook than the filebeat_data_shipper_test one, but adapted to the current RC release |
 | python_data_shipper_test | Publish dummy data in Kafka by using Python, directly using a JSON chain, using Day-2 configuration and the information model proposed. Only one metric is monitored |
 | spanish_site_demo_20th_may_2020 | Scripts for the demo executed in the Spanish site the 20th May 2020 |
