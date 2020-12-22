@@ -1,0 +1,10 @@
+- hosts: server
+  #become: yes
+  gather_facts: no
+  tasks:
+    - name: Execute script provided
+      ansible.windows.win_shell: "{{ script }}"
+      register: script_exec
+    - name: Print script execution
+      debug:
+        var: script_exec.stdout
