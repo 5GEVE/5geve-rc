@@ -3,7 +3,7 @@
   gather_facts: no
   tasks:
     - name: Execute script provided
-      ansible.windows.win_shell: "{{ script }}"
+      ansible.windows.win_command: "{{ script }}"
       register: script_exec
     - name: Print script execution
       debug:
